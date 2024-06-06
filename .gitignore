@@ -1,0 +1,6 @@
+.idea/
+*.class
+target/
+/out/
+/dependency-reduced-pom.xml
+/ThermalTrayIcon.iml
