@@ -9,18 +9,32 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class RefreshRunner extends TimerTask {
+    public static final long DEFAULT_REFRESH_RATE = 5000L;
 
     public static final String PASSWORD_TEXT = "Password:";
     private final TrayIcon trayIcon;
+    private final Long refreshRate;
     private String password;
     public static final String[] cmdArray = {"/bin/sh", "-c",
             "sudo -S powermetrics --samplers smc -i 1 -n 1 | grep -e \"temperature\" -e \"rpm\""};
 
-    public RefreshRunner(TrayIcon trayIcon) {
+    public RefreshRunner(TrayIcon trayIcon, Long refreshRate) {
         this.trayIcon = trayIcon;
+        if (refreshRate == null) {
+            refreshRate = DEFAULT_REFRESH_RATE;
+        }
+        this.refreshRate = refreshRate;
+    }
+
+    public void init() {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        executor.setRemoveOnCancelPolicy(true);
+        executor.scheduleAtFixedRate(this, 0L, this.refreshRate, TimeUnit.MILLISECONDS);
     }
 
     @Override

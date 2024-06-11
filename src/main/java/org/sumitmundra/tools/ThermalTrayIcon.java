@@ -4,12 +4,9 @@ import org.tinylog.Logger;
 
 import java.awt.*;
 import java.net.URL;
-import java.util.Timer;
 
 public class ThermalTrayIcon {
 
-    public static final Timer timer = new Timer("TooltipRefreshTimer", false);
-    public static final long DEFAULT_REFRESH_RATE = 5000L;
 
     public static void main(String[] args) {
         TrayIcon trayIcon = null;
@@ -31,12 +28,13 @@ public class ThermalTrayIcon {
                 Logger.error(e);
             }
         }
+
+        Long refreshRate = null;
+        if (args.length > 0) {
+            refreshRate = Long.parseLong(args[0]);
+        }
         if (trayAdded) {
-            long refreshRate = DEFAULT_REFRESH_RATE;
-            if (args.length > 0) {
-                refreshRate = Long.parseLong(args[0]);
-            }
-            timer.scheduleAtFixedRate(new RefreshRunner(trayIcon), 100L, refreshRate);
+            new RefreshRunner(trayIcon, refreshRate).init();
         }
     }
 
